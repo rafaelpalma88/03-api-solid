@@ -34,7 +34,7 @@ describe('UseCase: Authenticate', () => {
       email: 'john@doe.com'
     });
 
-    await expect(
+    await expect(() =>
       authenticateUseCase.execute({
         password: 'test@123',
         email: 'thelma@doe.com'
@@ -48,7 +48,7 @@ describe('UseCase: Authenticate', () => {
       email: 'john@doe.com'
     });
 
-    await expect(
+    await expect(() =>
       authenticateUseCase.execute({
         password: 'test@000',
         email: 'john@doe.com'
