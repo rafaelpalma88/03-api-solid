@@ -5,6 +5,7 @@ import { MoreThanOneCheckinOnTheSameDayError } from './errors/more-than-one-chec
 import { afterEach } from 'node:test';
 import { InMemoryGymsRepository } from '@/repositories/in-memory/in-memory-gyms-repository';
 import { Decimal } from '@prisma/client/runtime/library';
+import { MaxDistanceError } from './errors/max-distance-error';
 
 let checkInsRepository: InMemoryCheckInsRepository;
 let gymsRepository: InMemoryGymsRepository;
@@ -96,20 +97,6 @@ describe('UseCase: CheckIn', () => {
         userLatitude: -25.428543,
         userLongitude: -49.228618
       })
-    ).rejects.toBeInstanceOf(Error);
+    ).rejects.toBeInstanceOf(MaxDistanceError);
   });
-  // it('should not be able to do a checkin if gym does not exist', async () => {
-  //   const createdUser = await usersRepository.create({
-  //     name: 'John Doe',
-  //     password_hash: await hash('test@123', 6),
-  //     email: 'john@doe.com'
-  //   });
-
-  //   const { checkIn } = await checkInUseCase.execute({
-  //     gymId: 'gym-id-1',
-  //     userId: 'user-id-1'
-  //   });
-
-  //   expect(checkIn.id).toEqual(expect.any(String));
-  // });
 });

@@ -3,7 +3,9 @@ import { CheckInsRepository } from '@/repositories/check-ins-repository';
 import { MoreThanOneCheckinOnTheSameDayError } from './errors/more-than-one-checkin-same-day-error';
 import { GymsRepository } from '@/repositories/gyms-repository';
 import { ResourceNotFoundError } from './errors/resource-not-found-error';
-import { calculateDistance } from '@/lib/calculateDistance';
+import { calculateDistance } from '@/utils/calculateDistance';
+import { MaxDistanceError } from './errors/max-distance-error';
+import { LatitudeLongitudeNotFoundError } from './errors/latitude-and-longitude-not-found-error';
 
 interface CheckInUseCaseRequest {
   userId: string;
@@ -44,18 +46,18 @@ export class CheckinUseCase {
     }
 
     if (!userLatitude || !userLongitude) {
-      throw new ResourceNotFoundError(); // erro pois nao temos a latitude e longitude do usuário
+      throw new LatitudeLongitudeNotFoundError();
     }
 
-    const distanceBetweenUserAndGym = calculateDistance({
-      lat1: Number(gym.latitude),
-      lon1: Number(gym.longitude),
-      lat2: Number(userLatitude),
-      lon2: Number(userLongitude)
-    });
+    const distanceBetweenUserAndGym = calculateDistance(
+      { latitude: Number(gym.latitude), longitude: Number(gym.longitude) },
+      { latitude: Number(userLatitude), longitude: Number(userLongitude) }
+    );
 
-    if (distanceBetweenUserAndGym > 150) {
-      throw new ResourceNotFoundError(); // erro pois a distancia é maior que 150 metros
+    const MAX_DISTANCE_IN_METERS = 100;
+
+    if (distanceBetweenUserAndGym > MAX_DISTANCE_IN_METERS) {
+      throw new MaxDistanceError();
     }
 
     const checkIn = await this.checkInsRepository.create({
