@@ -65,8 +65,6 @@ export class InMemoryCheckInsRepository implements CheckInsRepository {
       .filter((item) => item.user_id === userId)
       .slice((page - 1) * 20, page * 20);
 
-    console.log('checkIns', checkIns);
-
     return checkIns;
   }
 }

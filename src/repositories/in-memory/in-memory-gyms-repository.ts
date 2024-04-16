@@ -1,9 +1,22 @@
 import { Gym, Prisma } from '@prisma/client';
-import { GymsRepository } from '../gyms-repository';
+import { FindManyNearbyParams, GymsRepository } from '../gyms-repository';
 import { Decimal } from '@prisma/client/runtime/library';
 import { randomUUID } from 'crypto';
+import { getDistanceBetweenCoordinates } from '@/utils/getDistanceBetweenCoordinates';
 
 export class InMemoryGymsRepository implements GymsRepository {
+  findManyNearby(params: FindManyNearbyParams): Promise<
+    {
+      id: string;
+      title: string;
+      description: string | null;
+      phone: string | null;
+      latitude: Prisma.Decimal;
+      longitude: Prisma.Decimal;
+    }[]
+  > {
+    throw new Error('Method not implemented.');
+  }
   public items: Gym[] = [];
   async create(data: Prisma.GymCreateInput): Promise<{
     id: string;
@@ -28,6 +41,40 @@ export class InMemoryGymsRepository implements GymsRepository {
     return gym;
   }
 
+  async searchMany(
+    query: string,
+    page: number
+  ): Promise<
+    {
+      id: string;
+      title: string;
+      description: string | null;
+      phone: string | null;
+      latitude: Prisma.Decimal;
+      longitude: Prisma.Decimal;
+    }[]
+  > {
+    return this.items
+      .filter((item) => item.title.includes(query))
+      .slice((page - 1) * 20, page * 20);
+  }
+
+  async searchNearby(params: FindManyNearbyParams): Promise<Gym[]> {
+    const gyms = this.items.filter((item) => {
+      const distance = getDistanceBetweenCoordinates(
+        { latitude: params.latitude, longitude: params.longitude },
+        {
+          latitude: item.latitude.toNumber(),
+          longitude: item.longitude.toNumber()
+        }
+      );
+
+      return distance < 10; // distancia menor que 10km
+    });
+
+    return gyms;
+  }
+
   async findById(id: string): Promise<{
     id: string;
     title: string;
@@ -36,12 +83,12 @@ export class InMemoryGymsRepository implements GymsRepository {
     latitude: Decimal;
     longitude: Decimal;
   } | null> {
-    const user = this.items.find((item) => item.id === id);
+    const gym = this.items.find((item) => item.id === id);
 
-    if (!user) {
+    if (!gym) {
       return null;
     }
 
-    return user;
+    return gym;
   }
 }

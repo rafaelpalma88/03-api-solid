@@ -3,7 +3,10 @@ interface Coordinate {
   longitude: number;
 }
 
-export function calculateDistance(from: Coordinate, to: Coordinate): number {
+export function getDistanceBetweenCoordinates(
+  from: Coordinate,
+  to: Coordinate
+): number {
   const R = 6371; // average radius of the Earth in kilometers
   const dLat = (to.latitude - from.latitude) * (Math.PI / 180);
   const dLon = (to.longitude - from.longitude) * (Math.PI / 180);

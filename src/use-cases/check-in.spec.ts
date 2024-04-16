@@ -59,6 +59,27 @@ describe('UseCase: CheckIn', () => {
       })
     ).rejects.toBeInstanceOf(MoreThanOneCheckinOnTheSameDayError);
   });
+  it('should not be able to do a checkin after 20 minutes', async () => {
+    vi.setSystemTime(new Date(2022, 0, 20, 8, 0, 0));
+
+    await checkInUseCase.execute({
+      gymId: 'gym-id-1',
+      userId: 'user-id-1',
+      userLatitude: -25.428543,
+      userLongitude: -49.228618
+    });
+
+    vi.setSystemTime(new Date(2022, 0, 20, 8, 30, 0));
+
+    await expect(() =>
+      checkInUseCase.execute({
+        gymId: 'gym-id-1',
+        userId: 'user-id-1',
+        userLatitude: -25.428543,
+        userLongitude: -49.228618
+      })
+    ).rejects.toBeInstanceOf(Error);
+  });
   it('should be able to checkin twice but in different days', async () => {
     vi.setSystemTime(new Date(2022, 0, 20, 8, 0, 0));
 

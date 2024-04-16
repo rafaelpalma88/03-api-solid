@@ -3,7 +3,7 @@ import { CheckInsRepository } from '@/repositories/check-ins-repository';
 import { MoreThanOneCheckinOnTheSameDayError } from './errors/more-than-one-checkin-same-day-error';
 import { GymsRepository } from '@/repositories/gyms-repository';
 import { ResourceNotFoundError } from './errors/resource-not-found-error';
-import { calculateDistance } from '@/utils/calculateDistance';
+import { getDistanceBetweenCoordinates } from '@/utils/getDistanceBetweenCoordinates';
 import { MaxDistanceError } from './errors/max-distance-error';
 import { LatitudeLongitudeNotFoundError } from './errors/latitude-and-longitude-not-found-error';
 
@@ -49,7 +49,7 @@ export class CheckinUseCase {
       throw new LatitudeLongitudeNotFoundError();
     }
 
-    const distanceBetweenUserAndGym = calculateDistance(
+    const distanceBetweenUserAndGym = getDistanceBetweenCoordinates(
       { latitude: Number(gym.latitude), longitude: Number(gym.longitude) },
       { latitude: Number(userLatitude), longitude: Number(userLongitude) }
     );
@@ -58,6 +58,17 @@ export class CheckinUseCase {
 
     if (distanceBetweenUserAndGym > MAX_DISTANCE_IN_METERS) {
       throw new MaxDistanceError();
+    }
+
+    const MAX_TIME_TO_CHECKIN = 20 * 60 * 1000; // 20 minutos em milissegundos
+    const currentTime = new Date();
+    console.log('currentTime', currentTime);
+
+    const futureTime = new Date(currentTime.getTime() + MAX_TIME_TO_CHECKIN);
+    console.log('futureTime', futureTime);
+
+    if (currentTime > futureTime) {
+      throw new Error(); // apontar erro de tempo máximo
     }
 
     const checkIn = await this.checkInsRepository.create({
