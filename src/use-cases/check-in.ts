@@ -60,17 +60,6 @@ export class CheckinUseCase {
       throw new MaxDistanceError();
     }
 
-    const MAX_TIME_TO_CHECKIN = 20 * 60 * 1000; // 20 minutos em milissegundos
-    const currentTime = new Date();
-    console.log('currentTime', currentTime);
-
-    const futureTime = new Date(currentTime.getTime() + MAX_TIME_TO_CHECKIN);
-    console.log('futureTime', futureTime);
-
-    if (currentTime > futureTime) {
-      throw new Error(); // apontar erro de tempo máximo
-    }
-
     const checkIn = await this.checkInsRepository.create({
       gym_id: gymId,
       user_id: userId

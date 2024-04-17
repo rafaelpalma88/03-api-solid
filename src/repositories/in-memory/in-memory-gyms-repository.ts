@@ -5,18 +5,6 @@ import { randomUUID } from 'crypto';
 import { getDistanceBetweenCoordinates } from '@/utils/getDistanceBetweenCoordinates';
 
 export class InMemoryGymsRepository implements GymsRepository {
-  findManyNearby(params: FindManyNearbyParams): Promise<
-    {
-      id: string;
-      title: string;
-      description: string | null;
-      phone: string | null;
-      latitude: Prisma.Decimal;
-      longitude: Prisma.Decimal;
-    }[]
-  > {
-    throw new Error('Method not implemented.');
-  }
   public items: Gym[] = [];
   async create(data: Prisma.GymCreateInput): Promise<{
     id: string;
